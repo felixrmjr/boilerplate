@@ -31,7 +31,7 @@ namespace Business.Repository.Repositories
         {
             var keys = new List<string>();
 
-            foreach (var key in _multiplexer.GetServer("187.37.84.49:6379").Keys(pattern: "*"))
+            foreach (var key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
                 keys.Add(key);
 
             return keys.Count() > 0 ? keys : null;
@@ -41,7 +41,7 @@ namespace Business.Repository.Repositories
         {
             var value = new List<string>();
 
-            foreach (var key in _multiplexer.GetServer("187.37.84.49:6379").Keys(pattern: "*"))
+            foreach (var key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
                 value.Add(await Get(key));
 
             return value.Count() > 0 ? value : null;
@@ -51,7 +51,7 @@ namespace Business.Repository.Repositories
         {
             var value = new List<T>();
 
-            foreach (var key in _multiplexer.GetServer("187.37.84.49:6379").Keys(pattern: "*"))
+            foreach (var key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
                 value.Add(await GetJson<T>(key));
 
             return value.Count() > 0 ? value : null;

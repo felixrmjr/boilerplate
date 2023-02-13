@@ -36,10 +36,7 @@ namespace AD.Server
 
             services.AddHangfire(config =>
             {
-                var runner = new MongoRunner().Start();
-                services.AddSingleton(runner);
-
-                var mongoUrlBuilder = new MongoUrlBuilder(runner.ConnectionString)
+                var mongoUrlBuilder = new MongoUrlBuilder(Configuration.GetSection("MongoConnection:ConnectionString").Value)
                 {
                     DatabaseName = "hangfire"
                 };
@@ -52,7 +49,7 @@ namespace AD.Server
                         MigrationStrategy = new MigrateMongoMigrationStrategy(),
                         BackupStrategy = new CollectionMongoBackupStrategy()
                     },
-                    CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.Watch,
+                    CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.TailNotificationsCollection,
                     InvisibilityTimeout = TimeSpan.FromMinutes(5)
                 };
 

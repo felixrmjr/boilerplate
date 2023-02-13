@@ -34,7 +34,7 @@ namespace Business.Background.Tasks
         {
             string[] tags = { "maid", "waifu", "marin-kitagawa", "mori-calliope", "raiden-shogun", "oppai", "selfies", "uniform" };
 
-            await Parallel.ForEachAsync(tags, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (tag, cancellationToken) =>
+            await Parallel.ForEachAsync(tags, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async (tag, cancellationToken) =>
             {
                 var response = await HttpHelpers.SendRequestRaw($"https://api.waifu.im/search/?included_tags={tag}&many=true", HttpMethod.Get);
                 var images = JsonConvert.DeserializeObject<WaifuIm>(await response.Content.ReadAsStringAsync());
@@ -53,7 +53,7 @@ namespace Business.Background.Tasks
         {
             string[] tags = { "ass", "hentai", "milf", "oral", "paizuri", "ecchi", "ero" };
 
-            await Parallel.ForEachAsync(tags, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (tag, cancellationToken) =>
+            await Parallel.ForEachAsync(tags, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async (tag, cancellationToken) =>
             {
                 var response = await HttpHelpers.SendRequestRaw($"https://api.waifu.im/search/?included_tags={tag}&many=true", HttpMethod.Get);
                 var images = JsonConvert.DeserializeObject<WaifuIm>(await response.Content.ReadAsStringAsync());

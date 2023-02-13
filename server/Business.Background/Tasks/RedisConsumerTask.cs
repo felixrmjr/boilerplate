@@ -22,7 +22,7 @@ namespace Business.Background.Tasks
                 {
                     var (nsfw, sfw) = GenerateFolders();
 
-                    await Parallel.ForEachAsync(keys, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (key, cancellationToken) =>
+                    await Parallel.ForEachAsync(keys, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async (key, cancellationToken) =>
                     {
                         if (key != null)
                         {

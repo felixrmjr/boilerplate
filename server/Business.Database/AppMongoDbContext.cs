@@ -1,5 +1,4 @@
 ﻿using Business.Domain.Model;
-using Business.Domain.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
@@ -33,14 +32,6 @@ namespace Business.Database
             get
             {
                 return _database.GetCollection<User>("users");
-            }
-        }
-
-        public IMongoCollection<Category>? Categories
-        {
-            get
-            {
-                return _database.GetCollection<Category>("categories");
             }
         }
 
