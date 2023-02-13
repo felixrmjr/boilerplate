@@ -1,0 +1,43 @@
+{
+	"HEADER": {
+		"NOTIFICATIONS": {
+			"TITLE": "Notifications",
+			"VIEW_ALL": "View All",
+			"LOAD_MORE": "View More..",
+			"FIRST": {
+				"TITLE": "Your order is placed",
+				"TEXT": "If several languages coalesce the grammar",
+				"TIME": "3 min ago"
+			}
+		},
+		"SETTINGS": "Settings",
+		"LOGIN": {
+			"PROFILE": "Profile",
+			"MY_WALLET": "My Wallet",
+			"SETTINGS": "Settings",
+			"LOCK_SCREEN": "Lock screen",
+			"LOGOUT": "Logout"
+		}
+	},
+	"MENUITEMS": {
+		"MENU": {
+			"TEXT": "Menu"
+		},
+		"DASHBOARDS": {
+			"TEXT": "Dashboards",
+			"BADGE": "01",
+			"LIST": {
+				"DEFAULT": "Default",
+				"SAAS": "Saas",
+				"CRYPTO": "Crypto",
+				"BLOG": "Blog"
+			}
+		},
+		"APPS": {
+			"TEXT": "Apps"
+		},
+		"CHAT": {
+			"TEXT": "Chat"
+		}
+	}
+}

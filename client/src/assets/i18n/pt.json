@@ -1,0 +1,43 @@
+{
+	"HEADER": {
+		"NOTIFICATIONS": {
+			"TITLE": "Notificações",
+			"VIEW_ALL": "Ver Todas",
+			"LOAD_MORE": "Ver Mais..",
+			"FIRST": {
+				"TITLE": "Seu pedido foi entregue",
+				"TEXT": "Poderia comfirmar se está tudo certo?",
+				"TIME": "3 min atrás"
+			}
+		},
+		"SETTINGS": "Configurações",
+		"LOGIN": {
+			"PROFILE": "Perfil",
+			"MY_WALLET": "Minha carteira",
+			"SETTINGS": "Configurações",
+			"LOCK_SCREEN": "Tela bloqueio",
+			"LOGOUT": "Sair"
+		}
+	},
+	"MENUITEMS": {
+		"MENU": {
+			"TEXT": "Menu"
+		},
+		"DASHBOARDS": {
+			"TEXT": "Dashboards",
+			"BADGE": "01",
+			"LIST": {
+				"DEFAULT": "Padrão",
+				"SAAS": "Saas",
+				"CRYPTO": "Crypto",
+				"BLOG": "Blog"
+			}
+		},
+		"APPS": {
+			"TEXT": "Apps"
+		},
+		"CHAT": {
+			"TEXT": "Chat"
+		}
+	}
+}

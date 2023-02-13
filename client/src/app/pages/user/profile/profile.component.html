@@ -1,0 +1,122 @@
+<div class="container-fluid">
+	<!-- start page title -->
+	<app-page-title title="Profile" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+	<!-- end page title -->
+
+	<div class="row">
+		<div class="col-xl-4">
+			<div class="card overflow-hidden">
+				<div class="bg-soft bg-primary">
+					<div class="row">
+						<div class="col-7">
+							<div class="text-primary p-3">
+								<h5 class="text-primary">Bem-vindo!</h5>
+								<p></p>
+							</div>
+						</div>
+						<div class="col-5 align-self-end">
+							<img src="assets/images/profile-img.png" alt="" class="img-fluid" />
+						</div>
+					</div>
+				</div>
+				<div class="card-body pt-0">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="avatar-md profile-user-wid mb-4">
+								<img src="{{ user.profilePicture }}" alt="" class="img-thumbnail rounded-circle" />
+							</div>
+							<h5 class="font-size-15 text-truncate">{{ user.name }}</h5>
+							<p class="text-muted mb-0">Membro desde {{ createdDate }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-8">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Configurações do usuário</h5>
+                    <p class="card-title-desc">Visualize ou altere as suas informações aqui.</p>
+					<form  [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                        <ngb-alert type="danger" *ngIf="error" [dismissible]="false">{{ error }}</ngb-alert>
+
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-floating mb-3">
+									<input type="email" class="form-control" formControlName="email" id="input-email" value="{{ user.email }}"  [ngClass]="{ 'is-invalid': submitted && f.email.errors }"/>
+									<label for="input-email">Email</label>
+                                    <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+										<div *ngIf="f.email.errors.required">Email é obrigatório</div>
+										<div *ngIf="f.email.errors.email">Email deve ser um email válido</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-floating mb-3">
+									<input type="text" class="form-control" formControlName="name" id="input-name" value="{{ user.name }}" [ngClass]="{ 'is-invalid': submitted && f.name.errors }"/>
+									<label for="input-name">Nome</label>
+                                    <div *ngIf="submitted && f.name.errors" class="invalid-feedback">
+										<span *ngIf="f.name.errors.required">Nome é obrigatório</span>
+									</div>
+								</div>
+							</div>
+						</div>
+                        <div class="row">
+							<div class="col-md-6" *ngIf="!isChangingPassword">
+                                <div class="form-floating mb-3">
+									<input type="password" class="form-control" formControlName="password" id="input-password" value="{{ user.password }}" />
+									<label for="input-password">Senha</label>
+								</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+									<input type="text" class="form-control" formControlName="id" id="input-id" value="{{ user.id }}" />
+									<label for="input-id">Id</label>
+								</div>
+                            </div>
+						</div>
+                        <div class="row">
+							<div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-text">@</div>
+                                        <input type="text" class="form-control" formControlName="username" id="input-username" value="{{ user.username }}" />
+                                    </div>
+                                </div>
+                            </div>
+						</div>
+                        <div class="row" *ngIf="isChangingPassword">
+							<div class="col-md-6">
+                                <div class="form-floating mb-3">
+									<input type="password" class="form-control" formControlName="changePassword1" id="input-change-password-1" value="" />
+									<label for="input-change-password-1">Senha nova</label>
+								</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+									<input type="password" class="form-control" formControlName="changePassword2" id="input-change-password-2" value="" />
+									<label for="input-change-password-2">Digite a senha novamente</label>
+								</div>
+                            </div>
+						</div>
+                        <div class="row">
+							<div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="input-change-password" name="change-password" [(ngModel)]="isChangingPassword" (ngModelChange)="changePassword()" [ngModelOptions]="{standalone: true}">
+                                        <label class="form-check-label" for="input-change-password"> Alterar senha </label>
+                                    </div>
+                                </div>
+                            </div>
+						</div>
+						<div>
+							<button type="submit" class="btn btn-primary w-md">Salvar</button>
+						</div>
+					</form>
+				</div>
+				<!-- end card body -->
+			</div>
+			<!-- end card -->
+		</div>
+	</div>
+</div>
