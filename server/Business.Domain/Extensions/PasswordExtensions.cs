@@ -14,11 +14,11 @@ namespace Business.Domain.Extensions
             MD5CryptoServiceProvider objMD5CryptoService = new MD5CryptoServiceProvider();
             byte[] securityKeyArray = objMD5CryptoService.ComputeHash(UTF8Encoding.UTF8.GetBytes(await redis.Get("uniqueidentifier")));
             objMD5CryptoService.Clear();
-            var objTripleDESCryptoService = new TripleDESCryptoServiceProvider();
+            TripleDESCryptoServiceProvider objTripleDESCryptoService = new TripleDESCryptoServiceProvider();
             objTripleDESCryptoService.Key = securityKeyArray;
             objTripleDESCryptoService.Mode = CipherMode.ECB;
             objTripleDESCryptoService.Padding = PaddingMode.PKCS7;
-            var objCrytpoTransform = objTripleDESCryptoService.CreateEncryptor();
+            ICryptoTransform objCrytpoTransform = objTripleDESCryptoService.CreateEncryptor();
             byte[] resultArray = objCrytpoTransform.TransformFinalBlock(toEncryptedArray, 0, toEncryptedArray.Length);
             objTripleDESCryptoService.Clear();
 
@@ -31,11 +31,11 @@ namespace Business.Domain.Extensions
             MD5CryptoServiceProvider objMD5CryptoService = new MD5CryptoServiceProvider();
             byte[] securityKeyArray = objMD5CryptoService.ComputeHash(UTF8Encoding.UTF8.GetBytes(await redis.Get("uniqueidentifier")));
             objMD5CryptoService.Clear();
-            var objTripleDESCryptoService = new TripleDESCryptoServiceProvider();
+            TripleDESCryptoServiceProvider objTripleDESCryptoService = new TripleDESCryptoServiceProvider();
             objTripleDESCryptoService.Key = securityKeyArray;
             objTripleDESCryptoService.Mode = CipherMode.ECB;
             objTripleDESCryptoService.Padding = PaddingMode.PKCS7;
-            var objCrytpoTransform = objTripleDESCryptoService.CreateDecryptor();
+            ICryptoTransform objCrytpoTransform = objTripleDESCryptoService.CreateDecryptor();
             byte[] resultArray = objCrytpoTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
             objTripleDESCryptoService.Clear();
 

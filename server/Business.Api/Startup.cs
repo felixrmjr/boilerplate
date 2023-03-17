@@ -1,5 +1,6 @@
 using Api.Hubs;
 using AutoMapper;
+using Business.Api.Filter;
 using Business.Domain;
 using Business.Domain.Interfaces.Repositories;
 using Business.Domain.Interfaces.Services;
@@ -33,7 +34,10 @@ namespace AD.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(RequestLoggingFilter));
+            });
 
             services.AddApiVersioning(options =>
             {
@@ -48,11 +52,11 @@ namespace AD.Server
                 options.SubstituteApiVersionInUrl = true;
             });
 
-            var appSettingsSection = Configuration.GetSection("IdentityConfig");
+            IConfigurationSection appSettingsSection = Configuration.GetSection("IdentityConfig");
             services.Configure<IdentityConfig>(appSettingsSection);
 
-            var appSettings = appSettingsSection.Get<IdentityConfig>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            IdentityConfig appSettings = appSettingsSection.Get<IdentityConfig>();
+            byte[] key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             services.AddAuthentication(options =>
             {
@@ -161,7 +165,7 @@ namespace AD.Server
 
             services.Configure<MinioConnection>(Configuration.GetSection("MinioConnection"));
 
-            var config = new MapperConfiguration(cfg =>
+            MapperConfiguration config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<UserProfile>();
             });
@@ -183,6 +187,7 @@ namespace AD.Server
 
             IRedisRepository redis = ServiceLocator.Resolve<IRedisRepository>();
             redis.Set("uniqueidentifier", Configuration.GetSection("Config:uniqueidentifier").Value);
+            redis.Set("defaultdisk", "C");
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
@@ -193,7 +198,7 @@ namespace AD.Server
                 app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
-                    foreach (var description in provider.ApiVersionDescriptions)
+                    foreach (ApiVersionDescription description in provider.ApiVersionDescriptions)
                     {
                         options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                     }

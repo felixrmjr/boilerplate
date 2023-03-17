@@ -29,9 +29,9 @@ namespace Business.Repository.Repositories
 
         public List<string> GetAllKeys()
         {
-            var keys = new List<string>();
+            List<string> keys = new List<string>();
 
-            foreach (var key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
+            foreach (RedisKey key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
                 keys.Add(key);
 
             return keys.Count() > 0 ? keys : null;
@@ -39,9 +39,9 @@ namespace Business.Repository.Repositories
 
         public async Task<List<string>> GetAllKeysWithValue()
         {
-            var value = new List<string>();
+            List<string> value = new List<string>();
 
-            foreach (var key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
+            foreach (RedisKey key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
                 value.Add(await Get(key));
 
             return value.Count() > 0 ? value : null;
@@ -49,9 +49,9 @@ namespace Business.Repository.Repositories
 
         public async Task<List<T>> GetAllKeysWithValue<T>() where T : new()
         {
-            var value = new List<T>();
+            List<T> value = new List<T>();
 
-            foreach (var key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
+            foreach (RedisKey key in _multiplexer.GetServer("127.0.0.1:6379").Keys(pattern: "*"))
                 value.Add(await GetJson<T>(key));
 
             return value.Count() > 0 ? value : null;
@@ -59,28 +59,28 @@ namespace Business.Repository.Repositories
 
         public async Task<string> Get(string key)
         {
-            var value = await clientRedis.StringGetAsync(key);
+            RedisValue value = await clientRedis.StringGetAsync(key);
 
             return value.HasValue ? value.ToString() : null;
         }
 
         public async Task<T> Get<T>(string key)
         {
-            var value = await clientRedis.StringGetAsync(key);
+            RedisValue value = await clientRedis.StringGetAsync(key);
 
             return value.HasValue ? (T)Convert.ChangeType(value, typeof(T)) : default(T);
         }
 
         public async Task<T> GetJson<T>(string key) where T : new()
         {
-            var value = await clientRedis.StringGetAsync(key);
+            RedisValue value = await clientRedis.StringGetAsync(key);
 
             return value.HasValue ? JsonConvert.DeserializeObject<T>(value) : default(T);
         }
 
         public async Task<IEnumerable<T>> GetIEnumerableJson<T>(string key)
         {
-            var value = await clientRedis.StringGetAsync(key);
+            RedisValue value = await clientRedis.StringGetAsync(key);
 
             return value.HasValue ? JsonConvert.DeserializeObject<IEnumerable<T>>(value) : default(IEnumerable<T>);
         }

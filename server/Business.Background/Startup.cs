@@ -36,13 +36,13 @@ namespace AD.Server
 
             services.AddHangfire(config =>
             {
-                var mongoUrlBuilder = new MongoUrlBuilder(Configuration.GetSection("MongoConnection:ConnectionString").Value)
+                MongoUrlBuilder mongoUrlBuilder = new MongoUrlBuilder(Configuration.GetSection("MongoConnection:ConnectionString").Value)
                 {
                     DatabaseName = "hangfire"
                 };
-                var mongoClient = new MongoClient(mongoUrlBuilder.ToMongoUrl());
+                MongoClient mongoClient = new MongoClient(mongoUrlBuilder.ToMongoUrl());
 
-                var storageOptions = new MongoStorageOptions
+                MongoStorageOptions storageOptions = new MongoStorageOptions
                 {
                     MigrationOptions = new MongoMigrationOptions
                     {
@@ -74,16 +74,16 @@ namespace AD.Server
         {
             app.UseHangfireDashboard();
 
-            using (var connection = JobStorage.Current.GetConnection())
+            using (IStorageConnection connection = JobStorage.Current.GetConnection())
             {
-                foreach (var recurringJob in connection.GetRecurringJobs())
+                foreach (RecurringJobDto recurringJob in connection.GetRecurringJobs())
                 {
                     RecurringJob.RemoveIfExists(recurringJob.Id);
                 }
             }
 
-            RecurringJob.AddOrUpdate<RedisConsumerTask>(x => x.RedisConsumer(), Cron.Minutely);
-            RecurringJob.AddOrUpdate<RandomImageTask>(x => x.GetImage(), Cron.Minutely);
+            //RecurringJob.AddOrUpdate<RedisConsumerTask>(x => x.RedisConsumer(), Cron.Minutely);
+            //RecurringJob.AddOrUpdate<RandomImageTask>(x => x.GetImage(), Cron.Minutely);
             //RecurringJob.AddOrUpdate<CorruptFileTask>(x => x.CorruptFile(), "0 */10 * ? * *");
         }
     }

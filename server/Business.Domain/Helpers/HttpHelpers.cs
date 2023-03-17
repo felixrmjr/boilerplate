@@ -16,17 +16,17 @@ namespace Business.Domain.Helpers
 
         public static async Task<HttpResponseMessage> SendRequestRaw(string path, HttpMethod method, AuthenticationHeaderValue authentication = null, string content = null, string queryString = null)
         {
-            using (var client = new HttpClient())
+            using (HttpClient client = new HttpClient())
             {
                 if (authentication != null)
                     client.DefaultRequestHeaders.Authorization = authentication;
 
-                var builder = new UriBuilder(path);
+                UriBuilder builder = new UriBuilder(path);
 
                 if (queryString != null)
                     builder.Query += queryString;
 
-                var httpRequest = new HttpRequestMessage
+                HttpRequestMessage httpRequest = new HttpRequestMessage
                 {
                     Method = method,
                     RequestUri = new Uri(builder.ToString())
@@ -35,7 +35,7 @@ namespace Business.Domain.Helpers
                 if (content != null)
                     httpRequest.Content = new StringContent(content, Encoding.UTF8, "application/json");
 
-                var resultado = await _retryPolicy.ExecuteAsync(() => client.SendAsync(httpRequest));
+                HttpResponseMessage resultado = await _retryPolicy.ExecuteAsync(() => client.SendAsync(httpRequest));
 
                 return resultado;
             }

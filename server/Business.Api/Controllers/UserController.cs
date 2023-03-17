@@ -3,6 +3,7 @@ using Business.Domain.Interfaces.Services;
 using Business.Domain.Model;
 using Business.Domain.Model.DTO;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -40,7 +41,7 @@ namespace Api.Controllers
         [ProducesResponseType(401)]
         public async Task<IActionResult> Get()
         {
-            var users = await _userService.GetUsers();
+            IEnumerable<User> users = await _userService.GetUsers();
 
             return Ok(users);
         }
@@ -51,7 +52,7 @@ namespace Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var user = await _userService.GetUserById(id);
+            User user = await _userService.GetUserById(id);
 
             return user == null ? NotFound() : Ok(user);
         }
@@ -63,14 +64,14 @@ namespace Api.Controllers
         [ProducesResponseType(408)]
         public async Task<IActionResult> Put([FromRoute] Guid id, [FromBody] UserDTO dto)
         {
-            var user = _mapper.Map<User>(dto);
-            var result = await _validator.ValidateAsync(user);
+            User user = _mapper.Map<User>(dto);
+            ValidationResult result = await _validator.ValidateAsync(user);
 
             if (!result.IsValid) return BadRequest(Results.ValidationProblem(result.ToDictionary()));
 
             try
             {
-                var u = await _userService.PutUser(id, user);
+                User u = await _userService.PutUser(id, user);
 
                 _cache.GetOrCreate(u.Id, item =>
                 {

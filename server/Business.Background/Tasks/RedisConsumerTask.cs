@@ -14,13 +14,14 @@ namespace Business.Background.Tasks
 
         public async Task RedisConsumer()
         {
-            var keys = await _redisRepository.GetAllKeysWithValue<Image>();
+            List<Image> keys = await _redisRepository.GetAllKeysWithValue<Image>();
 
             try
             {
                 if (keys != null && keys.Count > 0)
                 {
-                    var (nsfw, sfw) = GenerateFolders();
+                    string disk = await _redisRepository.Get("defaultdisk");
+                    (string nsfw, string sfw) = GenerateFolders(disk);
 
                     await Parallel.ForEachAsync(keys, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async (key, cancellationToken) =>
                     {
@@ -45,10 +46,11 @@ namespace Business.Background.Tasks
                 Console.WriteLine(ex.ToString());
             }
 
-            static (string, string) GenerateFolders()
+            static (string, string) GenerateFolders(string disk)
             {
-                string nsfw = @"E:\NSFW";
-                string sfw = @"E:\SFW";
+                string nsfw = $@"{disk}:\NSFW";
+                string sfw = $@"{disk}:\SFW";
+
                 if (!Directory.Exists(nsfw))
                     Directory.CreateDirectory(nsfw);
 
@@ -59,18 +61,18 @@ namespace Business.Background.Tasks
             }
         }
 
-        private async Task DownloadImageAsync(string directoryPath, string fileName, Uri uri)
+        private static async Task DownloadImageAsync(string directoryPath, string fileName, Uri uri)
         {
-            using (var httpClient = new HttpClient())
+            using (HttpClient httpClient = new HttpClient())
             {
-                var uriWithoutQuery = uri.GetLeftPart(UriPartial.Path);
-                var fileExtension = Path.GetExtension(uriWithoutQuery);
+                string uriWithoutQuery = uri.GetLeftPart(UriPartial.Path);
+                string fileExtension = Path.GetExtension(uriWithoutQuery);
 
-                var path = Path.Combine(directoryPath, $"{fileName}{fileExtension}");
+                string path = Path.Combine(directoryPath, $"{fileName}{fileExtension}");
 
                 if (!File.Exists(path))
                 {
-                    var imageBytes = await httpClient.GetByteArrayAsync(uri);
+                    byte[] imageBytes = await httpClient.GetByteArrayAsync(uri);
                     await File.WriteAllBytesAsync(path, imageBytes);
                 }
             }

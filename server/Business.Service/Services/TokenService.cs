@@ -22,15 +22,17 @@ namespace Business.Service.Services
 
         public async Task<User> GenerateJWT(User u)
         {
-            var user = await _userService.GetUserById(u.Id);
+            User user = await _userService.GetUserById(u.Id);
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity();
 
-            var claimsIdentity = new ClaimsIdentity();
+            claimsIdentity.AddClaim(new Claim("Id", u.Id.ToString()));
+            claimsIdentity.AddClaim(new Claim("Username", u.Username));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, u.Email));
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, u.Role));
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_identity.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            byte[] key = Encoding.ASCII.GetBytes(_identity.Secret);
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claimsIdentity,
                 Issuer = _identity.ValidIssuer,
@@ -39,8 +41,8 @@ namespace Business.Service.Services
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var accessToken = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
-            var refreshToken = Guid.NewGuid().ToString();
+            string accessToken = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
+            string refreshToken = Guid.NewGuid().ToString();
 
             user.UpdateAccessToken(accessToken);
             user.UpdateRefreshToken(refreshToken);

@@ -11,12 +11,13 @@ namespace Business.Background.Tasks
             _redisRepository = redisRepository;
         }
 
-        public void CorruptFile()
+        public async void CorruptFile()
         {
-            var nsfw = Directory.GetFiles(@"E:\NSFW");
-            var sfw = Directory.GetFiles(@"E:\SFW");
+            string disk = await _redisRepository.Get("defaultdisk");
+            string[] nsfw = Directory.GetFiles($@"{disk}:\NSFW");
+            string[] sfw = Directory.GetFiles($@"{disk}:\SFW");
 
-            var files = new string[nsfw.Length + sfw.Length];
+            string[] files = new string[nsfw.Length + sfw.Length];
             nsfw.CopyTo(files, 0);
             sfw.CopyTo(files, nsfw.Length);
 
@@ -30,7 +31,7 @@ namespace Business.Background.Tasks
             }
         }
 
-        byte[] GetByteArray(long length)
+        static byte[] GetByteArray(long length)
         {
             Random rnd = new Random();
             byte[] b = new byte[length];

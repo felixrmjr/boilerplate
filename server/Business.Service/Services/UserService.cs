@@ -62,7 +62,7 @@ namespace Business.Service.Services
 
         public async Task<bool> DeleteTokens(Guid id)
         {
-            var u = await _userRepository.GetUserById(id);
+            User u = await _userRepository.GetUserById(id);
 
             if (u != null)
             {

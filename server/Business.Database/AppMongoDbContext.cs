@@ -1,4 +1,5 @@
 ﻿using Business.Domain.Model;
+using Business.Domain.Models.Others;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
@@ -14,7 +15,7 @@ namespace Business.Database
         {
             _client = new MongoClient(new MongoClientSettings
             {
-                Server = new MongoServerAddress("dynamiclabs.ddns.net", 27017),
+                Server = new MongoServerAddress("127.0.0.1", 27017),
                 ClusterConfigurator = cluster =>
                 {
                     cluster.Subscribe<CommandStartedEvent>(command =>
@@ -32,6 +33,14 @@ namespace Business.Database
             get
             {
                 return _database.GetCollection<User>("users");
+            }
+        }
+
+        public IMongoCollection<LogRequest>? Logs
+        {
+            get
+            {
+                return _database.GetCollection<LogRequest>("logs");
             }
         }
 

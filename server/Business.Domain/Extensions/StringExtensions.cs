@@ -7,7 +7,7 @@ namespace Business.Domain.Extensions
     {
         public static bool IsValidEmail(this string email)
         {
-            var expression = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+            Regex expression = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
 
             return expression.IsMatch(email);
         }

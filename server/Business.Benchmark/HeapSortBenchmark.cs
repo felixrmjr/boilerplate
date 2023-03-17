@@ -25,7 +25,7 @@ namespace Business.Background.Benchmark
 
             for (int i = n - 1; i > 0; i--)
             {
-                var _ = arr[0];
+                int _ = arr[0];
                 arr[0] = arr[i];
                 arr[i] = _;
 
@@ -47,7 +47,7 @@ namespace Business.Background.Benchmark
 
             if (largest != i)
             {
-                var _ = arr[i];
+                int _ = arr[i];
                 arr[i] = arr[largest];
                 arr[largest] = _;
 
@@ -71,7 +71,7 @@ namespace Business.Background.Benchmark
 
             for (int i = n - 1; i >= 0; i--)
             {
-                var _ = arr[0];
+                int _ = arr[0];
                 arr[0] = arr[i];
                 arr[i] = _;
 
@@ -83,9 +83,9 @@ namespace Business.Background.Benchmark
 
         void heapify2(int[] arr, int n, int i)
         {
-            var largest = i;
-            var l = 2 * i + 1;
-            var r = 2 * i + 2;
+            int largest = i;
+            int l = 2 * i + 1;
+            int r = 2 * i + 2;
 
             if (l < n && arr[l] > arr[largest])
                 largest = l;
@@ -95,7 +95,7 @@ namespace Business.Background.Benchmark
 
             if (largest != i)
             {
-                var _ = arr[i];
+                int _ = arr[i];
                 arr[i] = arr[largest];
                 arr[largest] = _;
 

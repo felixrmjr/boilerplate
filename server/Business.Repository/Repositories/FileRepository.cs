@@ -4,6 +4,7 @@ using Business.Domain.Model;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel;
+using Minio.Exceptions;
 
 namespace Business.Repository.Repositories
 {
@@ -13,12 +14,10 @@ namespace Business.Repository.Repositories
         public IDisposable SubscriptionIncompleteUpoads { get; private set; }
         public IDisposable SubscriptionFilesInBucket { get; private set; }
         public IDisposable SubscriptionObjects { get; private set; }
-        // TODO: Trocar por uma collection no mongo ou cache no redis.
         public List<string> Notifications { get; private set; } = new List<string>();
         public List<string> IncompleteUploads { get; private set; } = new List<string>();
         public List<string> FilesInBucket { get; private set; } = new List<string>();
         public List<string> Objects { get; private set; } = new List<string>();
-
 
         private readonly AppMinioDbContext _context;
 
@@ -29,9 +28,9 @@ namespace Business.Repository.Repositories
 
         public async Task<bool> VerifyIfBucketExists(string bucket)
         {
-            var args = new BucketExistsArgs()
+            BucketExistsArgs args = new BucketExistsArgs()
                 .WithBucket(bucket);
-            var found = await _context.Minio.BucketExistsAsync(args);
+            bool found = await _context.Minio.BucketExistsAsync(args);
             if (found)
                 return found;
             else
@@ -40,12 +39,12 @@ namespace Business.Repository.Repositories
 
         public async Task UpdateFile(string bucket, string filePath, string obj, ServerSideEncryption? sse = null)
         {
-            var bs = File.ReadAllBytes(filePath);
-            using (var filestream = new MemoryStream(bs))
+            byte[] bs = File.ReadAllBytes(filePath);
+            using (MemoryStream filestream = new MemoryStream(bs))
             {
-                var fileInfo = new FileInfo(filePath);
-                var metaData = new Dictionary<string, string> { { "Metadata", $"{bucket}_{obj}" } };
-                var args = new PutObjectArgs()
+                FileInfo fileInfo = new FileInfo(filePath);
+                Dictionary<string, string> metaData = new Dictionary<string, string> { { "Metadata", $"{bucket}_{obj}" } };
+                PutObjectArgs args = new PutObjectArgs()
                     .WithBucket(bucket)
                     .WithObject(obj)
                     .WithStreamData(filestream)
@@ -59,11 +58,11 @@ namespace Business.Repository.Repositories
 
         public async Task CopyFile(string fromBucket, string fromObj, string toBucket, string toObj, ServerSideEncryption? sseSrc = null, ServerSideEncryption? sseDest = null)
         {
-            var cpSrcArgs = new CopySourceObjectArgs()
+            CopySourceObjectArgs cpSrcArgs = new CopySourceObjectArgs()
                 .WithBucket(fromBucket)
                 .WithObject(fromObj)
                 .WithServerSideEncryption(sseSrc);
-            var args = new CopyObjectArgs()
+            CopyObjectArgs args = new CopyObjectArgs()
                 .WithBucket(toBucket)
                 .WithObject(toObj)
                 .WithCopyObjectSource(cpSrcArgs)
@@ -87,12 +86,12 @@ namespace Business.Repository.Repositories
 
         public void GetFilesInBucketByPrefix(string bucket, string? prefix, bool? recursive = true, bool? versions = false)
         {
-            var listArgs = new ListObjectsArgs()
+            ListObjectsArgs listArgs = new ListObjectsArgs()
                 .WithBucket(bucket)
                 .WithPrefix(prefix)
                 .WithRecursive((bool)recursive);
 
-            var observable = _context.Minio.ListObjectsAsync(listArgs);
+            IObservable<Item> observable = _context.Minio.ListObjectsAsync(listArgs);
             SubscriptionFilesInBucket = observable.Subscribe(
                 item => FilesInBucket.Add(item.Key),
                 ex => throw new Exception(ex.Message));
@@ -100,25 +99,25 @@ namespace Business.Repository.Repositories
 
         public async Task<BucketNotification> GetBucketNotifications(string bucket)
         {
-            var args = new GetBucketNotificationsArgs()
+            GetBucketNotificationsArgs args = new GetBucketNotificationsArgs()
                 .WithBucket(bucket);
             return await _context.Minio.GetBucketNotificationsAsync(args);
         }
 
         public async Task<IEnumerable<Bucket>> GetAllBuckets()
         {
-            var list = await _context.Minio.ListBucketsAsync();
+            ListAllMyBucketsResult list = await _context.Minio.ListBucketsAsync();
             return list.Buckets;
         }
 
         public void ListenIncompleteUploads(string bucket, string? prefix, bool? recursive = true)
         {
-            var args = new ListIncompleteUploadsArgs()
+            ListIncompleteUploadsArgs args = new ListIncompleteUploadsArgs()
                 .WithBucket(bucket)
                 .WithPrefix(prefix)
                 .WithRecursive((bool)recursive);
 
-            var observable = _context.Minio.ListIncompleteUploads(args);
+            IObservable<Upload> observable = _context.Minio.ListIncompleteUploads(args);
             SubscriptionIncompleteUpoads = observable.Subscribe(
                 item => IncompleteUploads.Add(item.Key),
                 ex => throw new Exception(ex.Message));
@@ -127,13 +126,13 @@ namespace Business.Repository.Repositories
         public void ListenBucketNotifications(string bucket, List<EventType> events, string? prefix = "", string? suffix = "", bool? recursive = true)
         {
             events = events ?? new List<EventType> { EventType.ObjectCreatedAll };
-            var args = new ListenBucketNotificationsArgs()
+            ListenBucketNotificationsArgs args = new ListenBucketNotificationsArgs()
                 .WithBucket(bucket)
                 .WithPrefix(prefix)
                 .WithEvents(events)
                 .WithSuffix(suffix);
 
-            var observable = _context.Minio.ListenBucketNotificationsAsync(bucket, events, prefix, suffix);
+            IObservable<MinioNotificationRaw> observable = _context.Minio.ListenBucketNotificationsAsync(bucket, events, prefix, suffix);
             SubscriptionNotifications = observable.Subscribe(
                 notification => Notifications.Add(notification.json),
                 ex => throw new Exception(ex.Message));
@@ -141,14 +140,14 @@ namespace Business.Repository.Repositories
 
         public async Task RemoveAllBucketNotifications(string bucket)
         {
-            var args = new RemoveAllBucketNotificationsArgs()
+            RemoveAllBucketNotificationsArgs args = new RemoveAllBucketNotificationsArgs()
                 .WithBucket(bucket);
             await _context.Minio.RemoveAllBucketNotificationsAsync(args);
         }
 
         public async Task RemoveIncompleteUpload(string bucket, string obj)
         {
-            var args = new RemoveIncompleteUploadArgs()
+            RemoveIncompleteUploadArgs args = new RemoveIncompleteUploadArgs()
                 .WithBucket(bucket)
                 .WithObject(obj);
             await _context.Minio.RemoveIncompleteUploadAsync(args);
@@ -156,7 +155,7 @@ namespace Business.Repository.Repositories
 
         public async Task RemoveObject(string bucket, string obj, string? versionId = null)
         {
-            var args = new RemoveObjectArgs()
+            RemoveObjectArgs args = new RemoveObjectArgs()
                 .WithBucket(bucket)
                 .WithObject(obj);
 
@@ -170,11 +169,11 @@ namespace Business.Repository.Repositories
 
         public async Task RemoveObjects(string bucket, List<string> objs)
         {
-            var objArgs = new RemoveObjectsArgs()
+            RemoveObjectsArgs objArgs = new RemoveObjectsArgs()
                 .WithBucket(bucket)
                 .WithObjects(objs);
 
-            var objectsOservable = await _context.Minio.RemoveObjectsAsync(objArgs).ConfigureAwait(false);
+            IObservable<DeleteError> objectsOservable = await _context.Minio.RemoveObjectsAsync(objArgs).ConfigureAwait(false);
             SubscriptionObjects = objectsOservable.Subscribe(
                 objDeleteError => Objects.Add(objDeleteError.Key),
                 ex => throw new Exception(ex.Message));
