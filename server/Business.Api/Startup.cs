@@ -152,6 +152,11 @@ namespace AD.Server
                            .AllowCredentials();
                 }));
 
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.MaxRequestBodySize = int.MaxValue;
+            });
+
             services.Configure<FormOptions>(options =>
             {
                 options.ValueLengthLimit = int.MaxValue;
@@ -179,6 +184,8 @@ namespace AD.Server
             services.AddScoped<IFileRepository, FileRepository>();
 
             services.AddScoped<ITokenService, TokenService>();
+
+            services.AddScoped<ILogRequestRepository, LogRequestRepository>();
 
             services.AddSingleton<IRedisRepository, RedisRepository>();
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect($"{Configuration.GetSection("RedisConnection:Host").Value}:{Configuration.GetSection("RedisConnection:Port").Value}"));
